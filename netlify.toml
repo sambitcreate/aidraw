@@ -3,12 +3,22 @@
   publish = "dist"
   # Default build command (aligns with the yarn.lock in the repo)
   command = "yarn build"
+  # Netlify Functions directory
+  functions = "netlify/functions"
   # Skip builds when only docs/metadata files change
   ignore = "bash -c 'if [ -z \"$CACHED_COMMIT_REF\" ]; then exit 1; fi; git diff --name-only $CACHED_COMMIT_REF $COMMIT_REF | grep -vE \"^(docs/|.*\\.md$|\\.gitignore|netlify\\.toml)$\" >/dev/null && exit 1 || exit 0'"
 
 # Environment variables (can be overridden in Netlify UI)
 [build.environment]
   NODE_VERSION = "20"
+
+# Local development configuration
+[dev]
+  command = "vite"
+  targetPort = 3002
+  port = 8888
+  publish = "dist"
+  autoLaunch = false
 
 # Redirects and headers can be added here
 [[redirects]]
