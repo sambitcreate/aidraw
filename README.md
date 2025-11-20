@@ -7,9 +7,10 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 - **Gesture-Based Drawing**: Use hand tracking to draw with pinch gestures
 - **Real-Time Hand Tracking**: Powered by Google MediaPipe for smooth cursor movement
 - **AI Art Analysis**: Google Gemini AI analyzes and interprets your drawings
-- **Color Palette**: Choose from vibrant neon colors for your artwork
-- **Adjustable Brush Sizes**: Multiple brush sizes for different drawing styles
+- **Color Palette**: Choose from 7 vibrant colors including neon pink, cyan, lime green, and more
+- **Adjustable Brush Sizes**: 4 brush sizes (4px, 8px, 12px, 20px) for different drawing styles
 - **Desktop Experience**: Optimized for desktop browsers with webcam support
+- **Real-time Visual Feedback**: See your video feed, drawing canvas, and custom cursor simultaneously
 
 ## How It Works
 
@@ -17,19 +18,23 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 2. **Hand Tracking**: MediaPipe detects your hand movements and tracks your index finger
 3. **Pinch to Draw**: Make a pinch gesture (thumb and index finger together) to draw
 4. **Create Art**: Move your hand while pinching to draw on the canvas
-5. **AI Analysis**: Click "GUESS DRAWING" to have AI analyze your creation
+5. **AI Analysis**: Click "GUESS DRAWING" to have Gemini AI analyze your creation
+6. **Get Feedback**: Receive enthusiastic interpretation of your artwork in under 30 words
 
 ## Technology Stack
 
-- **Frontend**: React with TypeScript
-- **Computer Vision**: Google MediaPipe Hand Landmarker
+- **Frontend**: React 19.2 with TypeScript
+- **Computer Vision**: Google MediaPipe Hand Landmarker v0.10.22
 - **AI Analysis**: Google Gemini 2.5 Flash
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
+- **Build Tool**: Vite 6.2
+- **Styling**: Tailwind CSS (CDN)
+- **Package Manager**: Yarn 1.22
+- **Icons**: Lucide React
 
 ## Prerequisites
 
-- Node.js (version 18 or higher)
+- Node.js (version 20 or higher)
+- Yarn package manager (version 1.22 or higher)
 - A desktop device with a webcam
 - Google Gemini API key
 
@@ -38,12 +43,12 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/sambitcreate/aidraw.git
-   cd aidraw
+   cd airdraw-studio
    ```
 
 2. **Install dependencies**:
    ```bash
-   npm install
+   yarn install
    ```
 
 3. **Set up environment variables**:
@@ -54,10 +59,10 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 
 4. **Run the development server**:
    ```bash
-   npm run dev
+   yarn dev
    ```
 
-5. **Open your browser** and navigate to `http://localhost:5173`
+5. **Open your browser** and navigate to the local URL shown in the terminal (typically `http://localhost:5173` or similar)
 
 ## API Setup
 
@@ -71,17 +76,84 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 ## Project Structure
 
 ```
-aidraw/
+airdraw-studio/
 ├── components/
-│   ├── VideoCanvas.tsx    # Main canvas with hand tracking
-│   └── Toolbar.tsx        # UI controls for colors and actions
+│   ├── VideoCanvas.tsx    # Main canvas with hand tracking & MediaPipe integration
+│   └── Toolbar.tsx        # UI controls for colors, brush sizes, and actions
 ├── services/
-│   └── geminiService.ts   # AI analysis service
-├── types.ts               # TypeScript type definitions
-├── App.tsx               # Main application component
-├── AGENTS.md             # AI agents documentation
-└── netlify.toml          # Deployment configuration
+│   └── geminiService.ts   # Google Gemini AI analysis service
+├── App.tsx                # Main application component with state management
+├── index.tsx              # Application entry point and React root
+├── index.html             # HTML template with Tailwind CSS CDN & import maps
+├── types.ts               # TypeScript type definitions & constants (colors, brush sizes)
+├── vite.config.ts         # Vite build configuration
+├── tsconfig.json          # TypeScript configuration
+├── netlify.toml           # Netlify deployment configuration (Node 20)
+├── package.json           # Project dependencies & scripts
+├── .env.local             # Environment variables (create this file)
+├── .nvmrc                 # Node.js version specification (v20)
+├── README.md              # Project documentation
+├── AGENTS.md              # AI agents and services documentation
+├── CLAUDE.md              # Claude AI integration guide
+└── GEMINI.md              # Gemini API configuration guide
 ```
+
+## Key Components
+
+### VideoCanvas
+
+The main component that handles:
+
+- Webcam video streaming
+- MediaPipe hand landmark detection
+- Canvas rendering for drawings
+- Cursor tracking and visualization
+- Pinch gesture detection (threshold: 0.08)
+- Smooth cursor interpolation (smoothing factor: 0.2)
+
+### Toolbar
+
+UI component providing:
+
+- Color palette selection (7 colors)
+- Brush size controls (4 sizes)
+- Clear canvas button
+- AI analysis trigger button with loading states
+
+### Gemini Service
+
+AI integration that:
+
+- Converts canvas to base64 PNG format
+- Sends image to Gemini 2.5 Flash
+- Processes enthusiastic art critique responses
+- Handles errors gracefully with fallback messages
+
+## Configuration
+
+### Colors Available
+
+- Neon Pink (#ff00ff)
+- Cyan (#00ffff)
+- Lime Green (#39ff14)
+- Bright Yellow (#ffff00)
+- Orange (#ffaa00)
+- White (#ffffff)
+- Black (#000000) - Works as eraser
+
+### Brush Sizes
+
+- Small: 4px
+- Medium: 8px (default)
+- Large: 12px
+- Extra Large: 20px
+
+### MediaPipe Settings
+
+- Max hands detected: 1
+- Running mode: VIDEO (real-time)
+- Delegate: GPU acceleration
+- Model: Hand Landmarker Float16
 
 ## Deployment
 
@@ -89,22 +161,57 @@ The app is configured for easy deployment to Netlify:
 
 1. Connect your repository to Netlify
 2. Set the `API_KEY` environment variable in Netlify's dashboard
-3. Deploy - Netlify will automatically build and deploy your app
+3. Build command is automatically set to `yarn build`
+4. Publish directory is `dist`
+5. Node.js version is set to 20 in `netlify.toml`
+
+### Build Commands
+
+```bash
+yarn build     # Build for production
+yarn preview   # Preview production build locally
+yarn dev       # Run development server
+```
 
 ## Browser Support
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+- Chrome (recommended) - Best performance with MediaPipe
+- Firefox - Full support
+- Safari - Full support
+- Edge - Full support
 
 **Note**: Mobile devices are not supported due to the requirement for precise hand tracking and webcam positioning.
 
-## Privacy
+## Privacy & Security
 
-- Webcam feed is processed locally in your browser
-- Only canvas images are sent to Gemini for analysis
+- Webcam feed is processed locally in your browser via MediaPipe
+- Only canvas images (drawings) are sent to Gemini for analysis
 - No video or personal data is stored or transmitted
+- API key should be stored securely in `.env.local` (not committed to git)
+
+## Troubleshooting
+
+### Black Screen Issue
+
+If you see a black screen:
+
+- Check browser console for errors
+- Ensure camera permissions are granted
+- Verify `.env.local` file exists with valid API key
+- Make sure you're using a desktop device (mobile not supported)
+
+### Hand Not Detected
+
+- Ensure good lighting conditions
+- Position hand clearly in front of camera
+- Keep hand within camera frame
+- Wait for MediaPipe to initialize (loading screen)
+
+### Drawing Not Working
+
+- Check that pinch gesture is detected (status badge shows "Active")
+- Ensure thumb and index finger tips are close together
+- Try adjusting hand distance from camera
 
 ## Contributing
 
@@ -122,9 +229,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Google MediaPipe](https://mediapipe.dev/) for hand tracking technology
 - [Google Gemini](https://ai.google.dev/) for AI analysis capabilities
-- [Vite](https://vitejs.dev/) for the build tool
-- [React](https://reactjs.org/) for the UI framework
+- [Vite](https://vitejs.dev/) for the blazing fast build tool
+- [React](https://react.dev/) for the UI framework
+- [Lucide](https://lucide.dev/) for beautiful icons
+- [Tailwind CSS](https://tailwindcss.com/) for styling utilities
 
 ## Support
 
 If you encounter any issues or have questions, please [open an issue](https://github.com/sambitcreate/aidraw/issues) on GitHub.
+
+## Links
+
+- **Live Demo**: [Coming Soon]
+- **GitHub**: [https://github.com/sambitcreate/aidraw](https://github.com/sambitcreate/aidraw)
+- **Documentation**: See AGENTS.md for detailed AI integration documentation
