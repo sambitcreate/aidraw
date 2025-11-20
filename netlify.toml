@@ -1,8 +1,14 @@
 [build]
   # Directory to publish (relative to root of your repo)
   publish = "dist"
-  # Default build command
-  command = "npm run build"
+  # Default build command (aligns with the yarn.lock in the repo)
+  command = "yarn build"
+  # Skip builds when only docs/metadata files change
+  ignore = "bash -c 'if [ -z \"$CACHED_COMMIT_REF\" ]; then exit 1; fi; git diff --name-only $CACHED_COMMIT_REF $COMMIT_REF | grep -vE \"^(docs/|.*\\.md$|\\.gitignore|netlify\\.toml)$\" >/dev/null && exit 1 || exit 0'"
+
+# Environment variables (can be overridden in Netlify UI)
+[build.environment]
+  NODE_VERSION = "18"
 
 # Redirects and headers can be added here
 [[redirects]]
@@ -10,26 +16,12 @@
   to = "/index.html"
   status = 200
 
-# Ignore changes to these files to prevent unnecessary deployments
-[build.ignore]
-  # Don't trigger a new deploy when only these files change
-  paths = [
-    "*.md",
-    "docs/**",
-    ".gitignore",
-    "netlify.toml"
-  ]
-
-# Environment variables (can be overridden in Netlify UI)
-[build.environment]
-  NODE_VERSION = "18"
-
 # Deploy context settings
 [context.production]
-  command = "npm run build"
+  command = "yarn build"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "yarn build"
 
 [context.branch-deploy]
-  command = "npm run build"
+  command = "yarn build"
