@@ -1,0 +1,8 @@
+{
+  "name": "AirDraw Studio",
+  "description": "A touch-free digital canvas driven by hand gestures. Draw in the air using your finger and use AI to analyze your creations.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
