@@ -1,7 +1,3 @@
-<div align="center">
-<img width="1200" height="475" alt="AIRDRAW Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
 # AIRDRAW - AI-Powered Gesture Drawing Canvas
 
 AIRDRAW is an innovative web application that combines computer vision with AI to create a unique drawing experience. Use hand gestures to draw on a virtual canvas, then let AI analyze your artwork!
