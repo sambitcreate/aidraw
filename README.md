@@ -54,7 +54,7 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 3. **Set up environment variables**:
    Create a `.env.local` file in the root directory and add your Gemini API key:
    ```
-   API_KEY=your_gemini_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
 4. **Run the development server**:
@@ -160,7 +160,7 @@ AI integration that:
 The app is configured for easy deployment to Netlify:
 
 1. Connect your repository to Netlify
-2. Set the `API_KEY` environment variable in Netlify's dashboard
+2. Set the `GEMINI_API_KEY` environment variable in Netlify's dashboard
 3. Build command is automatically set to `yarn build`
 4. Publish directory is `dist`
 5. Node.js version is set to 20 in `netlify.toml`
