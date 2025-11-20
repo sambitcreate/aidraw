@@ -1,0 +1,35 @@
+[build]
+  # Directory to publish (relative to root of your repo)
+  publish = "dist"
+  # Default build command
+  command = "npm run build"
+
+# Redirects and headers can be added here
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Ignore changes to these files to prevent unnecessary deployments
+[build.ignore]
+  # Don't trigger a new deploy when only these files change
+  paths = [
+    "*.md",
+    "docs/**",
+    ".gitignore",
+    "netlify.toml"
+  ]
+
+# Environment variables (can be overridden in Netlify UI)
+[build.environment]
+  NODE_VERSION = "18"
+
+# Deploy context settings
+[context.production]
+  command = "npm run build"
+
+[context.deploy-preview]
+  command = "npm run build"
+
+[context.branch-deploy]
+  command = "npm run build"
