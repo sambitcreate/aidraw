@@ -60,8 +60,8 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
    # Server-side only - NOT exposed to client
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
-
    **Note**: Use `GEMINI_API_KEY` (no `VITE_` prefix) to keep it server-side.
+   ```
 
 4. **Run the development server**:
    ```bash
@@ -165,17 +165,17 @@ AI integration that:
 
 The app is configured for easy deployment to Netlify with secure serverless functions:
 
-1. **Connect your repository** to Netlify
-2. **Set environment variable** in Netlify Dashboard → Site Settings → Environment Variables:
-   - Key: `GEMINI_API_KEY`
-   - Value: Your Gemini API key
-   - Scopes: All (Production, Deploy Previews, Branch deploys)
-3. **Build settings** (auto-detected from `netlify.toml`):
-   - Build command: `yarn build`
-   - Publish directory: `dist`
-   - Functions directory: `netlify/functions`
-   - Node.js version: 20
-4. **Deploy** - Your API key will be server-side only, never exposed in the deployed JavaScript!
+ 1. **Connect your repository** to Netlify
+ 2. **Set environment variable** in Netlify Dashboard → Site Settings → Environment Variables:
+    - Key: `GEMINI_API_KEY`
+    - Value: Your Gemini API key
+    - Scopes: All (Production, Deploy Previews, Branch deploys)
+ 3. **Build settings** (auto-detected from `netlify.toml`):
+    - Build command: `yarn build`
+    - Publish directory: `dist`
+    - Functions directory: `netlify/functions`
+    - Node.js version: 20
+ 4. **Deploy** - Your API key will be server-side only, never exposed in the deployed JavaScript!
 
 ### Local Development with Functions
 
