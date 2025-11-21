@@ -12,6 +12,9 @@ const App: React.FC = () => {
 
   const handleClear = () => {
     setEnhancedImage(null);
+    // Dispatch a custom event to trigger canvas clearing in VideoCanvas
+    const event = new CustomEvent('triggerClear');
+    window.dispatchEvent(event);
   };
 
   return (
@@ -23,7 +26,7 @@ const App: React.FC = () => {
         brushSize={brushSize}
         onColorSelect={setColor}
         onSizeSelect={setBrushSize}
-        onClear={() => setEnhancedImage(null)}
+        onClear={handleClear}
         isAnalysing={isAnalysing}
         setEnhancedImage={setEnhancedImage}
         setIsAnalysing={setIsAnalysing}

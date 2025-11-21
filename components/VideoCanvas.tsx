@@ -40,6 +40,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [isDetectionInitialized, setIsDetectionInitialized] = useState(false);
   const [isPinching, setIsPinching] = useState(false);
   
+  const lastHoveredActionRef = useRef<HTMLElement | null>(null);
   const lastPoint = useRef<Point | null>(null);
   const currentCursor = useRef<Point>({ x: 0, y: 0 });
   const handLandmarkerRef = useRef<HandLandmarker | null>(null);
@@ -144,8 +145,39 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const checkUiCollisions = (x: number, y: number) => {
     // Using document.elementFromPoint to find UI elements under the cursor
     // even if the cursor canvas is on top (because cursor canvas has pointer-events-none)
-    const element = document.elementFromPoint(x, y);
+    const element = document.elementFromPoint(x, y) as HTMLElement | null;
 
+    // --- Hand hover highlight for action buttons ---
+    let hoveredActionButton: HTMLElement | null = null;
+    if (element) {
+      hoveredActionButton = element.closest(
+        'button[data-action="analyze"], button[data-action="clear"]'
+      ) as HTMLElement | null;
+    }
+
+    if (hoveredActionButton !== lastHoveredActionRef.current) {
+      if (lastHoveredActionRef.current) {
+        lastHoveredActionRef.current.classList.remove(
+          'ring-2',
+          'ring-cyan-400',
+          'shadow-lg',
+          'scale-105'
+        );
+      }
+
+      if (hoveredActionButton) {
+        hoveredActionButton.classList.add(
+          'ring-2',
+          'ring-cyan-400',
+          'shadow-lg',
+          'scale-105'
+        );
+      }
+
+      lastHoveredActionRef.current = hoveredActionButton;
+    }
+
+    // --- Gesture "tap" interactions (only when pinching / drawing) ---
     if (element && isDrawingRef.current) {
       const colorAttr = element.getAttribute('data-color');
       if (colorAttr) {
@@ -211,6 +243,15 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
     };
   }, [handleAnalyze]);
 
+  useEffect(() => {
+    const handleClearTrigger = () => clearCanvas();
+    window.addEventListener('triggerClear', handleClearTrigger as EventListener);
+
+    return () => {
+      window.removeEventListener('triggerClear', handleClearTrigger as EventListener);
+    };
+  }, [clearCanvas]);
+
 
   const predictWebcam = () => {
     if (!videoRef.current || !canvasRef.current || !cursorCanvasRef.current || !handLandmarkerRef.current) return;
@@ -275,10 +316,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       const y = lerp(currentCursor.current.y, targetY, SMOOTHING_FACTOR);
       currentCursor.current = { x, y };
 
-      // UI Interaction Check
-      if (isPinchingNow) {
-         checkUiCollisions(x, y);
-      }
+      // Check for UI hover/gesture interactions under the hand cursor
+      checkUiCollisions(x, y);
 
       if (isPinchingNow) {
         // Active Drawing Cursor
@@ -323,6 +362,17 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       lastPoint.current = null;
       isDrawingRef.current = false;
       setIsPinching(false);
+
+      // Clear any lingering hover highlight when hand leaves the frame
+      if (lastHoveredActionRef.current) {
+        lastHoveredActionRef.current.classList.remove(
+          'ring-2',
+          'ring-cyan-400',
+          'shadow-lg',
+          'scale-105'
+        );
+        lastHoveredActionRef.current = null;
+      }
     }
 
     animationFrameId.current = requestAnimationFrame(predictWebcam);
