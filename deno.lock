@@ -16,12 +16,14 @@
         "npm:@netlify/functions@^5.1.0",
         "npm:@types/node@^22.14.0",
         "npm:@vitejs/plugin-react@5",
+        "npm:gsap@^3.13.0",
         "npm:lucide-react@0.554",
         "npm:netlify-cli@^23.11.1",
         "npm:react-dom@^19.2.0",
         "npm:react@^19.2.0",
         "npm:typescript@~5.8.2",
-        "npm:vite@^6.2.0"
+        "npm:vite@^6.2.0",
+        "npm:vitest@^3.0.4"
       ]
     }
   }

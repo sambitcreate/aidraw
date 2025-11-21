@@ -15,7 +15,7 @@
 # Local development configuration
 [dev]
   command = "vite"
-  targetPort = 3002
+  targetPort = 3000
   port = 8888
   publish = "dist"
   autoLaunch = false

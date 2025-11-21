@@ -141,7 +141,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
               key={c.value}
               data-color={c.value}
               onClick={() => onSelectColor(c.value)}
-              className={`h-10 w-full rounded-lg border transition-all duration-150 flex items-center justify-center ${
+              className={`h-10 w-full rounded-full border transition-all duration-150 flex items-center justify-center ${
                 selectedColor === c.value
                   ? 'border-[#2f8cff] shadow-[0_0_0_1px_rgba(47,140,255,0.35)] scale-105'
                   : 'border-[#1f1f1f] hover:border-[#2a2a2a]'

@@ -51,37 +51,26 @@ const App: React.FC = () => {
         />
       </VideoCanvas>
         
-      {/* Result Toast Overlay */}
+      {/* Result Display */}
       {enhancedImage && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-top-4 fade-in duration-300">
-          <div className="bg-black/90 backdrop-blur-md border border-zinc-800 p-6 rounded-xl shadow-2xl relative flex flex-col gap-3">
-              <button
-                onClick={() => setEnhancedImage(null)}
-                className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="flex items-center gap-2 text-white">
-                <div className="p-1.5 bg-white/10 rounded-full">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <h3 className="font-semibold text-xs uppercase tracking-widest">AI Enhancement</h3>
-              </div>
-
-              <div className="rounded-lg border border-zinc-800 overflow-hidden bg-zinc-950/60">
-                <img src={enhancedImage} alt="Enhanced drawing" className="w-full h-auto" />
-              </div>
-
-              <a
-                href={enhancedImage}
-                download="airdraw-enhanced.png"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-black bg-white rounded-md px-3 py-2 hover:bg-zinc-200 transition-colors w-fit"
-              >
-                <Download className="w-4 h-4" />
-                Save Image
-              </a>
-          </div>
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-in slide-in-from-top-4 fade-in duration-300">
+          <button
+            onClick={() => setEnhancedImage(null)}
+            className="text-zinc-500 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          
+          <img src={enhancedImage} alt="Enhanced drawing" className="max-w-md rounded-lg shadow-2xl" />
+          
+          <a
+            href={enhancedImage}
+            download="airdraw-enhanced.png"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-black bg-white rounded-md px-3 py-2 hover:bg-zinc-200 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Save
+          </a>
         </div>
       )}
       
