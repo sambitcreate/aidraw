@@ -8,8 +8,10 @@ const ANALYZE_COOLDOWN_MS = 10000; // 10 seconds cooldown
 interface ToolbarProps {
   selectedColor: string;
   brushSize: number;
+  tool: 'draw' | 'erase';
   onSelectColor: (color: string) => void;
   onSelectSize: (size: number) => void;
+  onSelectTool: (tool: 'draw' | 'erase') => void;
   onClear: () => void;
   onAnalyze: () => void;
   isAnalysing: boolean;
@@ -18,8 +20,10 @@ interface ToolbarProps {
 const Toolbar: React.FC<ToolbarProps> = ({
   selectedColor,
   brushSize,
+  tool,
   onSelectColor,
   onSelectSize,
+  onSelectTool,
   onClear,
   onAnalyze,
   isAnalysing
@@ -82,24 +86,54 @@ const Toolbar: React.FC<ToolbarProps> = ({
   }, [isAnalysing]);
 
   return (
-    <div className="absolute right-0 top-0 h-full w-72 bg-black/90 backdrop-blur-sm border-l border-zinc-800 p-6 flex flex-col gap-8 z-20">
-      
-      <div className="space-y-1 pt-2">
-        <h1 className="text-2xl font-bold text-white tracking-tight">
-          AIRDRAW
-        </h1>
-        <p className="text-[11px] text-zinc-500 font-medium uppercase tracking-widest">
-          Gesture Canvas
-        </p>
+    <div className="absolute right-0 top-0 h-full w-80 bg-[#141414]/95 border-l border-[#1f1f1f] text-zinc-100 p-5 flex flex-col gap-6 z-20 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-500 via-slate-700 to-black border border-[#242424] shadow-inner flex items-center justify-center text-sm font-semibold">
+          S
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Studio</p>
+          <p className="text-sm font-semibold text-white">AIRDRAW</p>
+        </div>
       </div>
 
-      <div className="h-px bg-zinc-800 w-full" />
+      {/* Tool toggle */}
+      <div className="grid grid-cols-2 gap-2 bg-[#121212] border border-[#1f1f1f] rounded-lg p-2">
+        <button
+          data-tool="draw"
+          onClick={() => onSelectTool('draw')}
+          className={`flex items-center gap-2 h-10 px-3 rounded-md border transition-all ${
+            tool === 'draw'
+              ? 'border-[#2f8cff] bg-[#1b2f4f] text-white shadow-[0_0_0_1px_rgba(47,140,255,0.35)]'
+              : 'border-[#1f1f1f] bg-[#161616] text-zinc-300 hover:border-[#2a2a2a]'
+          }`}
+        >
+          <Paintbrush className="w-4 h-4" />
+          <span className="text-sm font-medium">Brush</span>
+        </button>
+        <button
+          data-tool="erase"
+          onClick={() => onSelectTool('erase')}
+          className={`flex items-center gap-2 h-10 px-3 rounded-md border transition-all ${
+            tool === 'erase'
+              ? 'border-[#2f8cff] bg-[#1b2f4f] text-white shadow-[0_0_0_1px_rgba(47,140,255,0.35)]'
+              : 'border-[#1f1f1f] bg-[#161616] text-zinc-300 hover:border-[#2a2a2a]'
+          }`}
+        >
+          <Trash2 className="w-4 h-4" />
+          <span className="text-sm font-medium">Eraser</span>
+        </button>
+      </div>
 
-      {/* Colors */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-zinc-400">
-          <Palette className="w-3 h-3" />
-          <h3 className="text-[10px] font-semibold uppercase tracking-widest">Palette</h3>
+      {/* Palette */}
+      <div className="bg-[#121212] border border-[#1f1f1f] rounded-xl p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between text-xs text-zinc-400">
+          <div className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            <span className="font-semibold text-zinc-200">Selection colors</span>
+          </div>
+          <span className="text-[11px] text-zinc-500 uppercase tracking-[0.2em]">Palette</span>
         </div>
         <div className="grid grid-cols-4 gap-3">
           {COLORS.map((c) => (
@@ -107,42 +141,42 @@ const Toolbar: React.FC<ToolbarProps> = ({
               key={c.value}
               data-color={c.value}
               onClick={() => onSelectColor(c.value)}
-              className={`w-12 h-12 rounded-full transition-all duration-200 focus:outline-none ${
+              className={`h-10 w-full rounded-lg border transition-all duration-150 flex items-center justify-center ${
                 selectedColor === c.value
-                  ? 'ring-2 ring-white scale-110 z-10'
-                  : 'hover:scale-105 opacity-80 hover:opacity-100'
+                  ? 'border-[#2f8cff] shadow-[0_0_0_1px_rgba(47,140,255,0.35)] scale-105'
+                  : 'border-[#1f1f1f] hover:border-[#2a2a2a]'
               }`}
-              style={{
-                backgroundColor: c.value,
-                border: '1px solid rgba(255,255,255,0.1)'
-              }}
+              style={{ backgroundColor: c.value }}
               title={c.name}
             />
           ))}
         </div>
       </div>
 
-      {/* Brush Size */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-zinc-400">
-          <Paintbrush className="w-3 h-3" />
-          <h3 className="text-[10px] font-semibold uppercase tracking-widest">Stroke Weight</h3>
+      {/* Brush size */}
+      <div className="bg-[#121212] border border-[#1f1f1f] rounded-xl p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between text-xs text-zinc-400">
+          <div className="flex items-center gap-2">
+            <Paintbrush className="w-4 h-4" />
+            <span className="font-semibold text-zinc-200">Stroke</span>
+          </div>
+          <span className="text-[11px] text-zinc-500 uppercase tracking-[0.2em]">Weight</span>
         </div>
-        <div className="flex items-center justify-between bg-zinc-900/50 p-2 rounded-lg border border-zinc-800/50">
+        <div className="grid grid-cols-4 gap-2">
           {BRUSH_SIZES.map((size) => (
             <button
               key={size}
               data-size={size}
               onClick={() => onSelectSize(size)}
-              className={`flex items-center justify-center w-10 h-10 rounded-md transition-all ${
-                brushSize === size 
-                  ? 'bg-zinc-800 text-white border border-zinc-700 shadow-sm' 
-                  : 'text-zinc-600 hover:text-zinc-300 hover:bg-zinc-900'
+              className={`h-10 rounded-lg border flex items-center justify-center transition-all ${
+                brushSize === size
+                  ? 'border-[#2f8cff] bg-[#1b2f4f] text-white shadow-[0_0_0_1px_rgba(47,140,255,0.35)]'
+                  : 'border-[#1f1f1f] bg-[#161616] text-zinc-300 hover:border-[#2a2a2a]'
               }`}
             >
-              <div 
+              <div
                 className="rounded-full bg-current"
-                style={{ width: Math.max(3, size / 2.5), height: Math.max(3, size / 2.5) }}
+                style={{ width: Math.max(4, size / 2.2), height: Math.max(4, size / 2.2) }}
               />
             </button>
           ))}
@@ -152,15 +186,15 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <div className="flex-1" />
 
       {/* Actions */}
-      <div className="space-y-3 pb-4">
+      <div className="space-y-3 pb-2">
         <div className="relative">
           {isAnalysing && (
             <div
               ref={indicatorRef}
               className="pointer-events-none absolute -inset-[6px] rounded-md overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-400 via-cyan-300 to-amber-300 opacity-70" />
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-teal-300 to-yellow-300 opacity-60 blur-lg" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#2f8cff] via-[#6ee7ff] to-[#7c3aed] opacity-25" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#2f8cff] via-[#6ee7ff] to-[#7c3aed] opacity-25 blur-lg" />
             </div>
           )}
           <button
@@ -169,8 +203,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
             disabled={isButtonDisabled}
             className={`group relative w-full h-11 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all
               ${isButtonDisabled
-                ? 'bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800'
-                : 'bg-white text-black hover:bg-zinc-200 border border-white'
+                ? 'bg-[#1a1a1a] text-zinc-500 cursor-not-allowed border border-[#222]'
+                : 'bg-[#2f8cff] text-white hover:bg-[#2574d7] border border-[#2f8cff] shadow-[0_10px_30px_rgba(47,140,255,0.25)]'
               }`}
           >
             {isAnalysing ? (
@@ -187,13 +221,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <button
           data-action="clear"
           onClick={onClear}
-          className="group w-full h-11 rounded-md bg-transparent border border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white hover:border-zinc-700 flex items-center justify-center gap-2 text-sm font-medium transition-all"
+          className="group w-full h-11 rounded-md bg-[#161616] border border-[#1f1f1f] text-zinc-300 hover:bg-[#1d1d1d] hover:text-white hover:border-[#2a2a2a] flex items-center justify-center gap-2 text-sm font-medium transition-all"
         >
           <Trash2 className="w-4 h-4 transition-transform group-hover:rotate-12" />
           <span className="tracking-wide">CLEAR CANVAS</span>
         </button>
       </div>
-
     </div>
   );
 };

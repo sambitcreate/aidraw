@@ -12,8 +12,10 @@ const CURSOR_RADIUS = 6;
 interface VideoCanvasProps {
   selectedColor: string;
   brushSize: number;
+  tool: 'draw' | 'erase';
   onColorSelect: (color: string) => void;
   onSizeSelect: (size: number) => void;
+  onToolSelect: (tool: 'draw' | 'erase') => void;
   onClear: () => void;
   isAnalysing: boolean;
   setEnhancedImage: (dataUrl: string) => void;
@@ -24,8 +26,10 @@ interface VideoCanvasProps {
 const VideoCanvas: React.FC<VideoCanvasProps> = ({
   selectedColor,
   brushSize,
+  tool,
   onColorSelect,
   onSizeSelect,
+  onToolSelect,
   onClear,
   isAnalysing,
   setEnhancedImage,
@@ -41,6 +45,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [isPinching, setIsPinching] = useState(false);
   
   const selectedColorRef = useRef<string>(selectedColor);
+  const brushSizeRef = useRef<number>(brushSize);
+  const toolRef = useRef<'draw' | 'erase'>(tool);
   const lastHoveredActionRef = useRef<HTMLElement | null>(null);
   const lastPoint = useRef<Point | null>(null);
   const currentCursor = useRef<Point>({ x: 0, y: 0 });
@@ -58,6 +64,14 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   useEffect(() => {
     selectedColorRef.current = selectedColor;
   }, [selectedColor]);
+
+  useEffect(() => {
+    brushSizeRef.current = brushSize;
+  }, [brushSize]);
+
+  useEffect(() => {
+    toolRef.current = tool;
+  }, [tool]);
 
   // --- Setup MediaPipe ---
   useEffect(() => {
@@ -197,28 +211,36 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         if (navigator.vibrate) navigator.vibrate(20);
       }
 
-      const actionAttr = element.getAttribute('data-action');
+      const targetToolEl = element.closest('[data-tool]') as HTMLElement | null;
+      const toolAttr = targetToolEl?.getAttribute('data-tool');
+      if (toolAttr === 'draw' || toolAttr === 'erase') {
+        onToolSelect(toolAttr);
+        if (navigator.vibrate) navigator.vibrate(20);
+      }
+
+      const actionButton = hoveredActionButton ?? (element.closest('[data-action]') as HTMLElement | null);
+      const actionAttr = actionButton?.getAttribute('data-action');
       if (actionAttr === 'clear') {
          clearCanvas();
       }
 
       if (actionAttr === 'analyze') {
         // Check if button is disabled (either analyzing or on cooldown)
-        const isDisabled = (element as HTMLButtonElement).disabled;
+        const isDisabled = (actionButton as HTMLButtonElement).disabled;
         if (!isDisabled) {
           // Trigger click on the actual button to use its cooldown logic
-          (element as HTMLButtonElement).click();
+          (actionButton as HTMLButtonElement).click();
         }
       }
     }
   };
 
-  const clearCanvas = useCallback(() => {
+  const clearCanvas = useCallback((notifyParent: boolean = true) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (canvas && ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      onClear();
+      if (notifyParent) onClear();
     }
   }, [onClear]);
 
@@ -250,7 +272,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   }, [handleAnalyze]);
 
   useEffect(() => {
-    const handleClearTrigger = () => clearCanvas();
+    const handleClearTrigger = () => clearCanvas(false);
     window.addEventListener('triggerClear', handleClearTrigger as EventListener);
 
     return () => {
@@ -326,10 +348,14 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       checkUiCollisions(x, y);
 
       if (isPinchingNow) {
+        // Set drawing mode based on tool (draw vs erase)
+        ctx.globalCompositeOperation = toolRef.current === 'erase' ? 'destination-out' : 'source-over';
+
         // Active Drawing Cursor
         cursorCtx.beginPath();
-        cursorCtx.arc(x, y, CURSOR_RADIUS * 1.5, 0, 2 * Math.PI);
-        cursorCtx.fillStyle = selectedColorRef.current;
+        const activeRadius = Math.max(CURSOR_RADIUS, brushSizeRef.current / 2 + 2);
+        cursorCtx.arc(x, y, activeRadius, 0, 2 * Math.PI);
+        cursorCtx.fillStyle = toolRef.current === 'erase' ? 'rgba(255,255,255,0.85)' : selectedColorRef.current;
         cursorCtx.fill();
         cursorCtx.strokeStyle = 'white';
         cursorCtx.lineWidth = 2;
@@ -340,7 +366,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           ctx.moveTo(lastPoint.current.x, lastPoint.current.y);
           ctx.lineTo(x, y);
           ctx.strokeStyle = selectedColorRef.current;
-          ctx.lineWidth = brushSize;
+          ctx.lineWidth = brushSizeRef.current;
           ctx.stroke();
         }
         
@@ -350,7 +376,8 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       } else {
         // Hover Cursor
         cursorCtx.beginPath();
-        cursorCtx.arc(x, y, CURSOR_RADIUS, 0, 2 * Math.PI);
+        const hoverRadius = Math.max(CURSOR_RADIUS, brushSizeRef.current / 2);
+        cursorCtx.arc(x, y, hoverRadius, 0, 2 * Math.PI);
         cursorCtx.strokeStyle = 'white'; // White cursor outline for better visibility on black/video
         cursorCtx.lineWidth = 2;
         cursorCtx.stroke();
@@ -358,7 +385,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         // Inner Color Dot
         cursorCtx.beginPath();
         cursorCtx.arc(x, y, 3, 0, 2 * Math.PI);
-        cursorCtx.fillStyle = selectedColorRef.current;
+        cursorCtx.fillStyle = toolRef.current === 'erase' ? 'rgba(255,255,255,0.85)' : selectedColorRef.current;
         cursorCtx.fill();
 
         lastPoint.current = null; 

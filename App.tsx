@@ -9,6 +9,7 @@ const App: React.FC = () => {
   const [brushSize, setBrushSize] = useState<number>(8);
   const [enhancedImage, setEnhancedImage] = useState<string | null>(null);
   const [isAnalysing, setIsAnalysing] = useState(false);
+  const [tool, setTool] = useState<'draw' | 'erase'>('draw');
 
   const handleClear = () => {
     setEnhancedImage(null);
@@ -24,8 +25,10 @@ const App: React.FC = () => {
       <VideoCanvas
         selectedColor={color}
         brushSize={brushSize}
+        tool={tool}
         onColorSelect={setColor}
         onSizeSelect={setBrushSize}
+        onToolSelect={setTool}
         onClear={handleClear}
         isAnalysing={isAnalysing}
         setEnhancedImage={setEnhancedImage}
@@ -35,8 +38,10 @@ const App: React.FC = () => {
         <Toolbar 
           selectedColor={color}
           brushSize={brushSize}
+          tool={tool}
           onSelectColor={setColor}
           onSelectSize={setBrushSize}
+          onSelectTool={setTool}
           onClear={handleClear}
           onAnalyze={() => { 
             const event = new CustomEvent('triggerAnalyze');
