@@ -6,9 +6,12 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 
 - **Gesture-Based Drawing**: Use hand tracking to draw with pinch gestures
 - **Real-Time Hand Tracking**: Powered by Google MediaPipe for smooth cursor movement
-- **AI Art Analysis**: Google Gemini AI analyzes and interprets your drawings
+- **AI Image Enhancement**: Google Gemini turns rough sketches into polished images
+- **Figma‑style Toolbar**: Dark, panelled sidebar with grouped controls
 - **Color Palette**: Choose from 7 vibrant colors including neon pink, cyan, lime green, and more
-- **Adjustable Brush Sizes**: 4 brush sizes (4px, 8px, 12px, 20px) for different drawing styles
+- **Adjustable Brush Sizes**: 4 brush sizes (4px, 8px, 12px, 20px) that affect stroke and cursor size
+- **Eraser Tool**: Switch to eraser mode from the toolbar or via hand tap
+- **Gesture‑Controlled UI**: Pinch over colors, brush sizes, tools, and buttons to “tap” them
 - **Desktop Experience**: Optimized for desktop browsers with webcam support
 - **Real-time Visual Feedback**: See your video feed, drawing canvas, and custom cursor simultaneously
 
@@ -17,9 +20,10 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 1. **Allow Camera Access**: The app requests permission to access your webcam
 2. **Hand Tracking**: MediaPipe detects your hand movements and tracks your index finger
 3. **Pinch to Draw**: Make a pinch gesture (thumb and index finger together) to draw
-4. **Create Art**: Move your hand while pinching to draw on the canvas
-5. **AI Analysis**: Click "GUESS DRAWING" to have Gemini AI analyze your creation
-6. **Get Feedback**: Receive enthusiastic interpretation of your artwork in under 30 words
+4. **Create Art**: Move your hand while pinching to draw or erase on the canvas
+5. **Gesture Controls**: While pinching, hover over palette, brush sizes, tools, or buttons to select them
+6. **AI Enhancement**: Click or pinch‑tap **ENHANCE DRAWING** to send the canvas to Gemini
+7. **View Result**: A toast overlay shows the enhanced PNG with a “Save Image” button
 
 ## Technology Stack
 
@@ -85,7 +89,7 @@ AIRDRAW is an innovative web application that combines computer vision with AI t
 airdraw-studio/
 ├── components/
 │   ├── VideoCanvas.tsx    # Main canvas with hand tracking & MediaPipe integration
-│   └── Toolbar.tsx        # UI controls for colors, brush sizes, and actions
+│   └── Toolbar.tsx        # Figma-style sidebar with colors, brush sizes, tools, and actions
 ├── services/
 │   └── geminiService.ts   # Google Gemini AI analysis service
 ├── App.tsx                # Main application component with state management
@@ -111,29 +115,30 @@ airdraw-studio/
 The main component that handles:
 
 - Webcam video streaming
-- MediaPipe hand landmark detection
-- Canvas rendering for drawings
-- Cursor tracking and visualization
-- Pinch gesture detection (threshold: 0.08)
-- Smooth cursor interpolation (smoothing factor: 0.2)
+– MediaPipe hand landmark detection  
+– Canvas rendering for drawings and erasing  
+– Cursor tracking and visualization (cursor size follows brush size)  
+– Pinch gesture detection for drawing and UI “taps”  
+– Smooth cursor interpolation (smoothing factor: 0.2)
 
 ### Toolbar
 
-UI component providing:
+Figma‑inspired sidebar providing:
 
+- Tool toggle row (Brush / Eraser)
 - Color palette selection (7 colors)
-- Brush size controls (4 sizes)
+- Brush size controls (4 sizes) wired into stroke width
 - Clear canvas button
-- AI analysis trigger button with loading states
+- AI enhancement trigger button with cooldown and animated loading state
 
 ### Gemini Service
 
 AI integration that:
 
-- Converts canvas to base64 PNG format
-- Sends image to Gemini 2.5 Flash
-- Processes enthusiastic art critique responses
-- Handles errors gracefully with fallback messages
+- Converts the current canvas to base64 PNG format
+- Sends the image to a Netlify Function backed by Gemini 2.5 Flash Image
+- Receives an upscaled/enhanced PNG and returns it as a `data:` URL
+- Handles errors gracefully with fallbacks and multi‑origin function discovery (local + Netlify Dev)
 
 ## Configuration
 
@@ -145,7 +150,7 @@ AI integration that:
 - Bright Yellow (#ffff00)
 - Orange (#ffaa00)
 - White (#ffffff)
-- Black (#000000) - Works as eraser
+- Black (#000000)
 
 ### Brush Sizes
 
@@ -153,6 +158,8 @@ AI integration that:
 - Medium: 8px (default)
 - Large: 12px
 - Extra Large: 20px
+
+Brush size affects both the stroke width and the visual cursor radius.
 
 ### MediaPipe Settings
 
