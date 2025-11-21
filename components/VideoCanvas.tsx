@@ -44,6 +44,12 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const animationFrameId = useRef<number | null>(null);
   const isDrawingRef = useRef<boolean>(false);
 
+  // Debug state changes
+  useEffect(() => {
+    console.log("State changed:", { isLoading, hasCameraPermission, isDetectionInitialized });
+    console.log("Should show init button:", !isLoading && hasCameraPermission && !isDetectionInitialized);
+  }, [isLoading, hasCameraPermission, isDetectionInitialized]);
+
   // --- Setup MediaPipe ---
   useEffect(() => {
     const setupHandLandmarker = async () => {
@@ -111,6 +117,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
       setHasCameraPermission(true);
       console.log("Camera ready, waiting for user to initialize hand detection");
+      console.log("State - isLoading:", false, "hasCameraPermission:", true, "isDetectionInitialized:", false);
     } catch (err) {
       console.error("Error accessing webcam:", err);
       setHasCameraPermission(false);
@@ -311,23 +318,31 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
       {/* Initialize Hand Detection Button */}
       {!isLoading && hasCameraPermission && !isDetectionInitialized && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/95 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-6 p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 shadow-2xl">
-            <Hand className="w-16 h-16 text-white animate-pulse" />
-            <div className="text-center space-y-2">
-              <h2 className="text-xl font-bold text-white tracking-wide">Camera Ready</h2>
-              <p className="text-sm text-zinc-400 max-w-sm">
-                Click below to start hand detection and begin drawing with your gestures
+        <div
+          className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="flex flex-col items-center gap-8 p-12 rounded-3xl bg-white/10 border-2 border-white/20 shadow-2xl max-w-md mx-4">
+            <Hand className="w-20 h-20 text-white animate-pulse drop-shadow-lg" />
+            <div className="text-center space-y-3">
+              <h2 className="text-3xl font-bold text-white tracking-wide drop-shadow-md">Camera Ready!</h2>
+              <p className="text-base text-white/80 leading-relaxed">
+                Click the button below to start hand tracking and begin drawing with your gestures
               </p>
             </div>
             <button
               onClick={initializeHandDetection}
-              className="px-8 py-4 bg-white text-black font-semibold rounded-full
-                       hover:bg-zinc-200 active:scale-95 transition-all duration-200
-                       shadow-lg hover:shadow-xl uppercase tracking-widest text-sm"
+              className="px-12 py-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-full
+                       hover:from-blue-600 hover:to-purple-700 active:scale-95 transition-all duration-200
+                       shadow-2xl hover:shadow-purple-500/50 uppercase tracking-widest text-base
+                       border-2 border-white/30 cursor-pointer"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              Start Hand Detection
+              🚀 Start Hand Detection
             </button>
+            <p className="text-xs text-white/50 mt-2">
+              Make sure your hand is visible in the camera
+            </p>
           </div>
         </div>
       )}
