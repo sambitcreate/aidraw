@@ -35,6 +35,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const cursorCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
+  const [isDetectionInitialized, setIsDetectionInitialized] = useState(false);
   const [isPinching, setIsPinching] = useState(false);
   
   const lastPoint = useRef<Point | null>(null);
@@ -109,14 +110,18 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
       });
 
       setHasCameraPermission(true);
-      console.log("Camera ready, starting hand detection loop");
-
-      // NOW start the animation loop after video is confirmed ready
-      predictWebcam();
+      console.log("Camera ready, waiting for user to initialize hand detection");
     } catch (err) {
       console.error("Error accessing webcam:", err);
       setHasCameraPermission(false);
     }
+  };
+
+  const initializeHandDetection = () => {
+    console.log("Initializing hand detection...");
+    setIsDetectionInitialized(true);
+    // Start the hand detection animation loop
+    predictWebcam();
   };
 
   const getDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
@@ -301,6 +306,29 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950 text-red-500">
           <Camera className="w-10 h-10 mb-4" />
           <p className="text-base font-medium">Camera Access Denied</p>
+        </div>
+      )}
+
+      {/* Initialize Hand Detection Button */}
+      {!isLoading && hasCameraPermission && !isDetectionInitialized && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/95 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-6 p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 shadow-2xl">
+            <Hand className="w-16 h-16 text-white animate-pulse" />
+            <div className="text-center space-y-2">
+              <h2 className="text-xl font-bold text-white tracking-wide">Camera Ready</h2>
+              <p className="text-sm text-zinc-400 max-w-sm">
+                Click below to start hand detection and begin drawing with your gestures
+              </p>
+            </div>
+            <button
+              onClick={initializeHandDetection}
+              className="px-8 py-4 bg-white text-black font-semibold rounded-full
+                       hover:bg-zinc-200 active:scale-95 transition-all duration-200
+                       shadow-lg hover:shadow-xl uppercase tracking-widest text-sm"
+            >
+              Start Hand Detection
+            </button>
+          </div>
         </div>
       )}
 
