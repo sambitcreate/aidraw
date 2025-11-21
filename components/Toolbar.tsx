@@ -107,14 +107,14 @@ const Toolbar: React.FC<ToolbarProps> = ({
               key={c.value}
               data-color={c.value}
               onClick={() => onSelectColor(c.value)}
-              className={`w-10 h-10 rounded-md transition-all duration-200 focus:outline-none ${
-                selectedColor === c.value 
-                  ? 'ring-2 ring-white scale-110 z-10' 
+              className={`w-12 h-12 rounded-full transition-all duration-200 focus:outline-none ${
+                selectedColor === c.value
+                  ? 'ring-2 ring-white scale-110 z-10'
                   : 'hover:scale-105 opacity-80 hover:opacity-100'
               }`}
-              style={{ 
-                backgroundColor: c.value, 
-                border: '1px solid rgba(255,255,255,0.1)' 
+              style={{
+                backgroundColor: c.value,
+                border: '1px solid rgba(255,255,255,0.1)'
               }}
               title={c.name}
             />

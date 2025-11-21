@@ -40,6 +40,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [isDetectionInitialized, setIsDetectionInitialized] = useState(false);
   const [isPinching, setIsPinching] = useState(false);
   
+  const selectedColorRef = useRef<string>(selectedColor);
   const lastHoveredActionRef = useRef<HTMLElement | null>(null);
   const lastPoint = useRef<Point | null>(null);
   const currentCursor = useRef<Point>({ x: 0, y: 0 });
@@ -52,6 +53,11 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
     console.log("State changed:", { isLoading, hasCameraPermission, isDetectionInitialized });
     console.log("Should show init button:", !isLoading && hasCameraPermission && !isDetectionInitialized);
   }, [isLoading, hasCameraPermission, isDetectionInitialized]);
+
+  // --- Setup MediaPipe ---
+  useEffect(() => {
+    selectedColorRef.current = selectedColor;
+  }, [selectedColor]);
 
   // --- Setup MediaPipe ---
   useEffect(() => {
@@ -323,7 +329,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         // Active Drawing Cursor
         cursorCtx.beginPath();
         cursorCtx.arc(x, y, CURSOR_RADIUS * 1.5, 0, 2 * Math.PI);
-        cursorCtx.fillStyle = selectedColor;
+        cursorCtx.fillStyle = selectedColorRef.current;
         cursorCtx.fill();
         cursorCtx.strokeStyle = 'white';
         cursorCtx.lineWidth = 2;
@@ -333,7 +339,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
           ctx.beginPath();
           ctx.moveTo(lastPoint.current.x, lastPoint.current.y);
           ctx.lineTo(x, y);
-          ctx.strokeStyle = selectedColor;
+          ctx.strokeStyle = selectedColorRef.current;
           ctx.lineWidth = brushSize;
           ctx.stroke();
         }
@@ -352,7 +358,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
         // Inner Color Dot
         cursorCtx.beginPath();
         cursorCtx.arc(x, y, 3, 0, 2 * Math.PI);
-        cursorCtx.fillStyle = selectedColor;
+        cursorCtx.fillStyle = selectedColorRef.current;
         cursorCtx.fill();
 
         lastPoint.current = null; 
