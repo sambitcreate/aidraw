@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { COLORS, BRUSH_SIZES } from '../types';
 import { Trash2, BrainCircuit, Palette, Paintbrush } from 'lucide-react';
+
+const ANALYZE_COOLDOWN_MS = 10000; // 10 seconds cooldown
 
 interface ToolbarProps {
   selectedColor: string;
@@ -21,6 +23,32 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onAnalyze,
   isAnalysing
 }) => {
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  const isOnCooldown = cooldownRemaining > 0;
+  const isButtonDisabled = isAnalysing || isOnCooldown;
+
+  const handleAnalyzeClick = useCallback(() => {
+    if (isButtonDisabled) return;
+    onAnalyze();
+    setCooldownRemaining(ANALYZE_COOLDOWN_MS);
+  }, [isButtonDisabled, onAnalyze]);
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+
+    const timer = setInterval(() => {
+      setCooldownRemaining((prev) => {
+        const next = prev - 100;
+        return next <= 0 ? 0 : next;
+      });
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
+
+  const cooldownSeconds = Math.ceil(cooldownRemaining / 1000);
+
   return (
     <div className="absolute right-0 top-0 h-full w-72 bg-black/90 backdrop-blur-sm border-l border-zinc-800 p-6 flex flex-col gap-8 z-20">
       
@@ -72,6 +100,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           {BRUSH_SIZES.map((size) => (
             <button
               key={size}
+              data-size={size}
               onClick={() => onSelectSize(size)}
               className={`flex items-center justify-center w-10 h-10 rounded-md transition-all ${
                 brushSize === size 
@@ -94,11 +123,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <div className="space-y-3 pb-4">
         <button
           data-action="analyze"
-          onClick={onAnalyze}
-          disabled={isAnalysing}
+          onClick={handleAnalyzeClick}
+          disabled={isButtonDisabled}
           className={`group w-full h-11 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all
-            ${isAnalysing 
-              ? 'bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800' 
+            ${isButtonDisabled
+              ? 'bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800'
               : 'bg-white text-black hover:bg-zinc-200 border border-white'
             }`}
         >
@@ -107,7 +136,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
           ) : (
             <BrainCircuit className="w-4 h-4 transition-transform group-hover:scale-110" />
           )}
-          <span className="tracking-wide font-semibold">{isAnalysing ? 'ANALYZING...' : 'GUESS DRAWING'}</span>
+          <span className="tracking-wide font-semibold">
+            {isAnalysing ? 'ANALYZING...' : isOnCooldown ? `WAIT ${cooldownSeconds}s` : 'GUESS DRAWING'}
+          </span>
         </button>
 
         <button

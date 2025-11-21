@@ -21,11 +21,12 @@ const App: React.FC = () => {
     <div className="relative h-screen w-screen bg-black text-zinc-100 overflow-hidden font-sans">
       
       {/* Main Canvas Area - Full Screen */}
-      <VideoCanvas 
+      <VideoCanvas
         selectedColor={color}
         brushSize={brushSize}
         onColorSelect={setColor}
-        onClear={() => setAiResult(null)} 
+        onSizeSelect={setBrushSize}
+        onClear={() => setAiResult(null)}
         isAnalysing={isAnalysing}
         setAnalysisResult={setAiResult}
         setIsAnalysing={setIsAnalysing}

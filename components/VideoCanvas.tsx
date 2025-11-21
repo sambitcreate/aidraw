@@ -13,6 +13,7 @@ interface VideoCanvasProps {
   selectedColor: string;
   brushSize: number;
   onColorSelect: (color: string) => void;
+  onSizeSelect: (size: number) => void;
   onClear: () => void;
   isAnalysing: boolean;
   setAnalysisResult: (text: string) => void;
@@ -24,6 +25,7 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
   selectedColor,
   brushSize,
   onColorSelect,
+  onSizeSelect,
   onClear,
   isAnalysing,
   setAnalysisResult,
@@ -143,21 +145,32 @@ const VideoCanvas: React.FC<VideoCanvasProps> = ({
     // Using document.elementFromPoint to find UI elements under the cursor
     // even if the cursor canvas is on top (because cursor canvas has pointer-events-none)
     const element = document.elementFromPoint(x, y);
-    
+
     if (element && isDrawingRef.current) {
       const colorAttr = element.getAttribute('data-color');
       if (colorAttr) {
         onColorSelect(colorAttr);
         if (navigator.vibrate) navigator.vibrate(20);
       }
-      
+
+      const sizeAttr = element.getAttribute('data-size');
+      if (sizeAttr) {
+        onSizeSelect(parseInt(sizeAttr, 10));
+        if (navigator.vibrate) navigator.vibrate(20);
+      }
+
       const actionAttr = element.getAttribute('data-action');
       if (actionAttr === 'clear') {
          clearCanvas();
       }
-      
-      if (actionAttr === 'analyze' && !isAnalysing) {
-        handleAnalyze();
+
+      if (actionAttr === 'analyze') {
+        // Check if button is disabled (either analyzing or on cooldown)
+        const isDisabled = (element as HTMLButtonElement).disabled;
+        if (!isDisabled) {
+          // Trigger click on the actual button to use its cooldown logic
+          (element as HTMLButtonElement).click();
+        }
       }
     }
   };
