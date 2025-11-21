@@ -13,6 +13,36 @@
         color: white;
         overflow: hidden; /* Prevent scrolling */
       }
+
+      /* Colorful GSAP-inspired orbit loader for the enhance button */
+      .gsap-orbit {
+        background: conic-gradient(
+          from 180deg,
+          #ff5f6d,
+          #ffc371,
+          #42a5f5,
+          #7c3aed,
+          #ff5f6d
+        );
+        filter: blur(4px);
+        animation: aurora-spin 1.6s linear infinite, aurora-hue 6s ease-in-out infinite alternate;
+        opacity: 0.9;
+      }
+
+      @keyframes aurora-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes aurora-hue {
+        0% {
+          filter: blur(4px) hue-rotate(0deg);
+        }
+        100% {
+          filter: blur(4px) hue-rotate(180deg);
+        }
+      }
     </style>
   <script type="importmap">
 {

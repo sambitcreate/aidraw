@@ -121,25 +121,33 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
       {/* Actions */}
       <div className="space-y-3 pb-4">
-        <button
-          data-action="analyze"
-          onClick={handleAnalyzeClick}
-          disabled={isButtonDisabled}
-          className={`group w-full h-11 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all
-            ${isButtonDisabled
-              ? 'bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800'
-              : 'bg-white text-black hover:bg-zinc-200 border border-white'
-            }`}
-        >
-          {isAnalysing ? (
-            <BrainCircuit className="w-4 h-4 animate-pulse" />
-          ) : (
-            <BrainCircuit className="w-4 h-4 transition-transform group-hover:scale-110" />
+        <div className="relative group w-full">
+          {isAnalysing && (
+            <div
+              aria-hidden
+              className="gsap-orbit absolute -inset-[3px] rounded-lg opacity-80 transition-opacity"
+            />
           )}
-          <span className="tracking-wide font-semibold">
-            {isAnalysing ? 'ANALYZING...' : isOnCooldown ? `WAIT ${cooldownSeconds}s` : 'GUESS DRAWING'}
-          </span>
-        </button>
+          <button
+            data-action="analyze"
+            onClick={handleAnalyzeClick}
+            disabled={isButtonDisabled}
+            className={`relative z-10 w-full h-11 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all overflow-hidden
+              ${isButtonDisabled
+                ? 'bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800'
+                : 'bg-white text-black hover:bg-zinc-200 border border-white'
+              }`}
+          >
+            {isAnalysing ? (
+              <BrainCircuit className="w-4 h-4 animate-pulse" />
+            ) : (
+              <BrainCircuit className="w-4 h-4 transition-transform group-hover:scale-110" />
+            )}
+            <span className="tracking-wide font-semibold">
+              {isAnalysing ? 'ENHANCING...' : isOnCooldown ? `WAIT ${cooldownSeconds}s` : 'ENHANCE DRAWING'}
+            </span>
+          </button>
+        </div>
 
         <button
           data-action="clear"

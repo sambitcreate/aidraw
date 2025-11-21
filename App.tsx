@@ -7,14 +7,11 @@ import { Sparkles, X } from 'lucide-react';
 const App: React.FC = () => {
   const [color, setColor] = useState<string>(COLORS[1].value); // Default Cyan
   const [brushSize, setBrushSize] = useState<number>(8);
-  const [aiResult, setAiResult] = useState<string | null>(null);
+  const [enhancedImage, setEnhancedImage] = useState<string | null>(null);
   const [isAnalysing, setIsAnalysing] = useState(false);
-  
-  const [clearTrigger, setClearTrigger] = useState(0);
 
   const handleClear = () => {
-    setClearTrigger(prev => prev + 1);
-    setAiResult(null);
+    setEnhancedImage(null);
   };
 
   return (
@@ -26,9 +23,9 @@ const App: React.FC = () => {
         brushSize={brushSize}
         onColorSelect={setColor}
         onSizeSelect={setBrushSize}
-        onClear={() => setAiResult(null)}
+        onClear={() => setEnhancedImage(null)}
         isAnalysing={isAnalysing}
-        setAnalysisResult={setAiResult}
+        setAnalysisResult={setEnhancedImage}
         setIsAnalysing={setIsAnalysing}
       >
         {/* Toolbar Overlay - Passed as child to sit between video and cursor */}
@@ -47,26 +44,42 @@ const App: React.FC = () => {
       </VideoCanvas>
         
       {/* Result Toast Overlay */}
-      {aiResult && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in slide-in-from-top-4 fade-in duration-300">
-          <div className="bg-black/90 backdrop-blur-md border border-zinc-800 p-6 rounded-xl shadow-2xl relative flex flex-col gap-3">
-              <button 
-                onClick={() => setAiResult(null)} 
-                className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              
-              <div className="flex items-center gap-2 text-white">
-                <div className="p-1.5 bg-white/10 rounded-full">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <h3 className="font-semibold text-xs uppercase tracking-widest">AI Analysis</h3>
+      {enhancedImage && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-black/90 backdrop-blur-md border border-zinc-800 p-6 rounded-xl shadow-2xl relative flex flex-col gap-4">
+            <button
+              onClick={() => setEnhancedImage(null)}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2 text-white">
+              <div className="p-1.5 bg-white/10 rounded-full">
+                <Sparkles className="w-4 h-4" />
               </div>
-              
-              <p className="text-zinc-300 text-sm leading-relaxed font-light">
-                {aiResult}
-              </p>
+              <h3 className="font-semibold text-xs uppercase tracking-widest">Enhanced Artwork</h3>
+            </div>
+
+            <div className="bg-gradient-to-br from-white/5 via-indigo-500/10 to-cyan-400/10 border border-white/10 rounded-lg overflow-hidden">
+              <img src={enhancedImage} alt="AI enhanced drawing" className="w-full h-auto block" />
+            </div>
+
+            <div className="flex flex-wrap gap-2 justify-end">
+              <a
+                href={enhancedImage}
+                download="airdraw-enhanced.png"
+                className="px-3 py-2 rounded-md border border-white/20 bg-white/10 text-xs font-semibold uppercase tracking-[0.16em] hover:bg-white/20 transition-colors"
+              >
+                Download
+              </a>
+              <button
+                onClick={() => window.open(enhancedImage, '_blank')}
+                className="px-3 py-2 rounded-md border border-zinc-800 text-xs font-semibold uppercase tracking-[0.16em] hover:bg-white/10 transition-colors"
+              >
+                Open Full Size
+              </button>
+            </div>
           </div>
         </div>
       )}

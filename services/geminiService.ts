@@ -1,10 +1,10 @@
 /**
- * Analyzes the drawing canvas to guess what is drawn.
- * Calls the serverless function to keep API key secure.
+ * Enhances the drawing canvas by sending it to the serverless function that
+ * calls Gemini image generation. Returns a data URL for the improved artwork.
  * @param base64Image The base64 encoded image string from the canvas.
- * @returns A string description of the drawing.
+ * @returns A base64 data URL of the enhanced drawing, or null if generation fails.
  */
-export const analyzeDrawing = async (base64Image: string): Promise<string> => {
+export const enhanceDrawing = async (base64Image: string): Promise<string | null> => {
   try {
     const response = await fetch('/.netlify/functions/analyze-drawing', {
       method: 'POST',
@@ -21,9 +21,9 @@ export const analyzeDrawing = async (base64Image: string): Promise<string> => {
     }
 
     const data = await response.json();
-    return data.result || "I couldn't quite see what that was. Try drawing it again!";
+    return typeof data.image === 'string' ? data.image : null;
   } catch (error) {
     console.error("Error analyzing drawing:", error);
-    return "Sorry, I had trouble seeing your masterpiece. Please check your connection.";
+    return null;
   }
 };
